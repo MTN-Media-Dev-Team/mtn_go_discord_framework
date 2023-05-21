@@ -1,4 +1,4 @@
-module mtn_go_discord_framework
+module github.com/MTN-Media-Dev-Team/mtn_go_discord_framework
 
 go 1.18
 
