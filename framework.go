@@ -154,7 +154,7 @@ func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if command, ok := commandsMap[i.ApplicationCommandData().Name]; ok {
 			validatedOptions, err := command.validateOptions(s, i)
 			if err != nil {
-				log.Printf("MTN Discord Framework - handleCommand: Invalid options for command '%s'", command.Name)
+				log.Printf("MTN Discord Framework - handleCommand: Invalid option '%s' for command '%s'", err.Error(), command.Name)
 				SendEphemeralResponse(s, i, fmt.Sprintf("Invalid option '%s'", err.Error()))
 				return
 			}
