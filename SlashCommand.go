@@ -45,99 +45,61 @@ func (s SlashCommand) validateOptions(session *discordgo.Session, i *discordgo.I
 		interactionOptionsMap[interactionOption.Name] = interactionOption
 	}
 	for _, option := range s.RequiredOptions {
-		if option.Required {
-			if interactionOption, ok := interactionOptionsMap[option.Name]; ok {
-				// Using a type switch instead of multiple case statements
-				switch option.Type {
-				case discordgo.ApplicationCommandOptionString:
-					returnContainer.Options[option.Name] = StringOption{
-						Value: interactionOption.StringValue(),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionInteger:
-					returnContainer.Options[option.Name] = IntegerOption{
-						Value: interactionOption.IntValue(),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionNumber:
-					returnContainer.Options[option.Name] = FloatOption{
-						Value: interactionOption.FloatValue(),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionBoolean:
-					returnContainer.Options[option.Name] = BooleanOption{
-						Value: interactionOption.BoolValue(),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionChannel:
-					returnContainer.Options[option.Name] = ChannelOption{
-						Value: interactionOption.ChannelValue(session),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionRole:
-					returnContainer.Options[option.Name] = RoleOption{
-						Value: interactionOption.RoleValue(session, i.GuildID),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionMentionable:
-					returnContainer.Options[option.Name] = UserOption{
-						Value: interactionOption.UserValue(session),
-						Name:  option.Name,
-					}
-				default:
-					return returnContainer, ErrInvalidOptionType
-				}
-			} else {
-				return returnContainer, ErrMissingRequiredOption
+		if interactionOption, ok := interactionOptionsMap[option.Name]; ok {
+			value, err := assignOptionValue(interactionOption, option, session, i.GuildID)
+			if err != nil {
+				return returnContainer, err
 			}
+			returnContainer.Options[option.Name] = value
+		} else if option.Required {
+			return returnContainer, ErrMissingRequiredOption
 		} else {
-			if interactionOption, ok := interactionOptionsMap[option.Name]; ok {
-				// Using a type switch instead of multiple case statements
-				switch option.Type {
-				case discordgo.ApplicationCommandOptionString:
-					returnContainer.Options[option.Name] = StringOption{
-						Value: interactionOption.StringValue(),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionInteger:
-					returnContainer.Options[option.Name] = IntegerOption{
-						Value: interactionOption.IntValue(),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionNumber:
-					returnContainer.Options[option.Name] = FloatOption{
-						Value: interactionOption.FloatValue(),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionBoolean:
-					returnContainer.Options[option.Name] = BooleanOption{
-						Value: interactionOption.BoolValue(),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionChannel:
-					returnContainer.Options[option.Name] = ChannelOption{
-						Value: interactionOption.ChannelValue(session),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionRole:
-					returnContainer.Options[option.Name] = RoleOption{
-						Value: interactionOption.RoleValue(session, i.GuildID),
-						Name:  option.Name,
-					}
-				case discordgo.ApplicationCommandOptionMentionable:
-					returnContainer.Options[option.Name] = UserOption{
-						Value: interactionOption.UserValue(session),
-						Name:  option.Name,
-					}
-				default:
-					return returnContainer, ErrInvalidOptionType
-				}
-			} else {
-				returnContainer.Options[option.Name] = option.Default
-			}
+			returnContainer.Options[option.Name] = option.Default
 		}
 	}
 	return returnContainer, nil
+}
+
+func assignOptionValue(interactionOption *discordgo.ApplicationCommandInteractionDataOption, option OptionRequirement, session *discordgo.Session, guildID string) (CommandOption, error) {
+	switch option.Type {
+	case discordgo.ApplicationCommandOptionString:
+		return StringOption{
+			Value: interactionOption.StringValue(),
+			Name:  option.Name,
+		}, nil
+	case discordgo.ApplicationCommandOptionInteger:
+		return IntegerOption{
+			Value: interactionOption.IntValue(),
+			Name:  option.Name,
+		}, nil
+	case discordgo.ApplicationCommandOptionNumber:
+		return FloatOption{
+			Value: interactionOption.FloatValue(),
+			Name:  option.Name,
+		}, nil
+	case discordgo.ApplicationCommandOptionBoolean:
+		return BooleanOption{
+			Value: interactionOption.BoolValue(),
+			Name:  option.Name,
+		}, nil
+	case discordgo.ApplicationCommandOptionChannel:
+		return ChannelOption{
+			Value: interactionOption.ChannelValue(session),
+			Name:  option.Name,
+		}, nil
+	case discordgo.ApplicationCommandOptionRole:
+		return RoleOption{
+			Value: interactionOption.RoleValue(session, guildID),
+			Name:  option.Name,
+		}, nil
+	case discordgo.ApplicationCommandOptionMentionable:
+		return UserOption{
+			Value: interactionOption.UserValue(session),
+			Name:  option.Name,
+		}, nil
+	default:
+		return nil, ErrInvalidOptionType
+	}
 }
 
 // declare errors
