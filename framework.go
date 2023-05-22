@@ -40,6 +40,7 @@ const (
 	ephemeralFlag = 64
 )
 
+// Initializes the framework and returns a discord session, needed for the other functions
 func InitFramework(debugMode bool, testingGuildId string, botToken string) *discordgo.Session {
 	debug = debugMode
 	testingGuildID = testingGuildId
@@ -56,6 +57,7 @@ func InitFramework(debugMode bool, testingGuildId string, botToken string) *disc
 	return discordSession
 }
 
+// Registers a slash command with the framework
 func RegisterSlashCommandWithFramework(command Command) {
 	if !ready {
 		log.Println("Framework not ready yet, cannot register command")
@@ -68,6 +70,20 @@ func RegisterSlashCommandWithFramework(command Command) {
 	commandsToRegister = append(commandsToRegister, command)
 }
 
+// Registers multiple slash commands with the framework
+func RegisterSlashCommandsWithFramework(commands []Command) {
+	if !ready {
+		log.Println("Framework not ready yet, cannot register commands")
+		return
+	}
+	if initDone {
+		log.Println("Framework already initialized, cannot register commands")
+		return
+	}
+	commandsToRegister = append(commandsToRegister, commands...)
+}
+
+// Registers a button handler with the framework
 func RegisterButtonHandlerWithFramework(handler ButtonHandler) {
 	if !ready {
 		log.Println("Framework not ready yet, cannot register command")
@@ -80,6 +96,22 @@ func RegisterButtonHandlerWithFramework(handler ButtonHandler) {
 	handlerMap[handler.CustomID] = handler
 }
 
+// Registers multiple button handlers with the framework
+func RegisterButtonHandlersWithFramework(handlers []ButtonHandler) {
+	if !ready {
+		log.Println("Framework not ready yet, cannot register commands")
+		return
+	}
+	if initDone {
+		log.Println("Framework already initialized, cannot register commands")
+		return
+	}
+	for _, handler := range handlers {
+		handlerMap[handler.CustomID] = handler
+	}
+}
+
+// Launches the framework and registers all commands and handlers
 func StartFramework() {
 	if !ready {
 		log.Println("Framework not ready yet, cannot start it. Call InitFramework first")
@@ -105,6 +137,7 @@ func StartFramework() {
 	registerCommands(discordSession)
 }
 
+// Shuts down the framework and closes the discord session
 func ShutdownFramework() {
 	if !ready || !initDone {
 		log.Println("Framework not started, cannot shut it down")
