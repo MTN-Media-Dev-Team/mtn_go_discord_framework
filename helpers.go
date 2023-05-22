@@ -13,7 +13,17 @@ func SendEphemeralResponse(s *discordgo.Session, i *discordgo.InteractionCreate,
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: msg,
-			Flags:   ephemeralFlag,
+			Flags:   EphemeralFlag,
+		},
+	})
+}
+
+func SendEphemeralEmbed(s *discordgo.Session, i *discordgo.InteractionCreate, embed *discordgo.MessageEmbed) {
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{embed},
+			Flags:  EphemeralFlag,
 		},
 	})
 }
@@ -65,7 +75,7 @@ func ReleaseSystem() {
 func CheckForRoles(s *discordgo.Session, i *discordgo.InteractionCreate, roles ...string) bool {
 	member, err := s.GuildMember(i.GuildID, i.Member.User.ID)
 	if err != nil {
-		log.Printf("Error getting guild member: %v", err)
+		log.Printf("MTN Discord Framework - CheckForRoles: Error getting guild member: %v", err)
 		return false
 	}
 

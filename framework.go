@@ -8,7 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type Command struct {
+type SlashCommand struct {
 	discordgo.ApplicationCommand
 	Handler func(s *discordgo.Session, i *discordgo.InteractionCreate, args ...string)
 }
@@ -19,8 +19,8 @@ type ButtonHandler struct {
 }
 
 var (
-	commandsToRegister = make([]Command, 0)
-	commandsMap        = make(map[string]Command)
+	commandsToRegister = make([]SlashCommand, 0)
+	commandsMap        = make(map[string]SlashCommand)
 	handlerMap         = make(map[string]ButtonHandler)
 	initCommandsOnce   sync.Once
 
@@ -37,7 +37,7 @@ var (
 )
 
 const (
-	ephemeralFlag = 64
+	EphemeralFlag = 64
 )
 
 // Initializes the framework and returns a discord session, needed for the other functions
@@ -58,7 +58,7 @@ func InitFramework(debugMode bool, testingGuildId string, botToken string) *disc
 }
 
 // Registers a slash command with the framework
-func RegisterSlashCommandWithFramework(command Command) {
+func RegisterSlashCommandWithFramework(command SlashCommand) {
 	if !ready {
 		log.Println("Framework not ready yet, cannot register command")
 		return
@@ -71,7 +71,7 @@ func RegisterSlashCommandWithFramework(command Command) {
 }
 
 // Registers multiple slash commands with the framework
-func RegisterSlashCommandsWithFramework(commands []Command) {
+func RegisterSlashCommandsWithFramework(commands []SlashCommand) {
 	if !ready {
 		log.Println("Framework not ready yet, cannot register commands")
 		return
@@ -208,7 +208,7 @@ func registerCommands(s *discordgo.Session) {
 func deleteCommands(s *discordgo.Session) {
 	guildid := ""
 	if debug {
-		log.Println("Registering commands in DEBUG mode")
+		log.Println("Deleting commands in DEBUG mode")
 		guildid = testingGuildID
 	}
 	for _, command := range commandsMap {
