@@ -8,11 +8,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-type SlashCommand struct {
-	discordgo.ApplicationCommand
-	Handler func(s *discordgo.Session, i *discordgo.InteractionCreate, args ...string)
-}
-
 type ButtonHandler struct {
 	CustomID string
 	Handler  func(s *discordgo.Session, i *discordgo.InteractionCreate, args ...string)
@@ -156,7 +151,13 @@ func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	// check if i type is ApplicationCommand (slash command)
 	case discordgo.InteractionApplicationCommand:
 		if command, ok := commandsMap[i.ApplicationCommandData().Name]; ok {
-			command.Handler(s, i)
+			validatedOptions, err := command.validateOptions(s, i)
+			if err != nil {
+				log.Printf("MTN Discord Framework - handleCommand: Invalid options for command '%s'", command.Name)
+				SendEphemeralResponse(s, i, "An Error occured: Invalid options")
+				return
+			}
+			command.Handler(s, i, &validatedOptions)
 			return
 		}
 		log.Printf("MTN Discord Framework - handleCommand: Unknown command '%s'", i.ApplicationCommandData().Name)
@@ -193,13 +194,15 @@ func registerCommands(s *discordgo.Session) {
 		guildid = testingGuildID
 	}
 	for name, command := range commandsMap {
-		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildid, &command.ApplicationCommand)
+		command.applicationCommand = command.generateApplicationCommand()
+
+		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildid, &command.applicationCommand)
 		if err != nil {
 			log.Printf("MTN Discord Framework - registerCommands: Cannot create '%s' command: %v", command.Name, err)
 			continue
 		}
 		// Update the command in the global commands map
-		command.ApplicationCommand = *cmd
+		command.applicationCommand = *cmd
 		commandsMap[name] = command
 	}
 	log.Println("MTN Discord Framework - registerCommands: Registered commands")
@@ -212,7 +215,7 @@ func deleteCommands(s *discordgo.Session) {
 		guildid = testingGuildID
 	}
 	for _, command := range commandsMap {
-		err := s.ApplicationCommandDelete(s.State.User.ID, guildid, command.ApplicationCommand.ID)
+		err := s.ApplicationCommandDelete(s.State.User.ID, guildid, command.applicationCommand.ID)
 		if err != nil {
 			log.Printf("MTN Discord Framework - deleteCommands: Cannot delete '%s' command: %v", command.Name, err)
 		}
