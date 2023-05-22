@@ -85,6 +85,46 @@ func (s SlashCommand) validateOptions(session *discordgo.Session, i *discordgo.I
 			} else {
 				return returnContainer, ErrMissingRequiredOption
 			}
+		} else {
+			if interactionOption, ok := interactionOptionsMap[option.Name]; ok {
+				// Using a type switch instead of multiple case statements
+				switch option.Type {
+				case discordgo.ApplicationCommandOptionString:
+					returnContainer.Options[option.Name] = StringOption{
+						Value: interactionOption.StringValue(),
+						Name:  option.Name,
+					}
+				case discordgo.ApplicationCommandOptionInteger:
+					returnContainer.Options[option.Name] = IntegerOption{
+						Value: interactionOption.IntValue(),
+						Name:  option.Name,
+					}
+				case discordgo.ApplicationCommandOptionBoolean:
+					returnContainer.Options[option.Name] = BooleanOption{
+						Value: interactionOption.BoolValue(),
+						Name:  option.Name,
+					}
+				case discordgo.ApplicationCommandOptionChannel:
+					returnContainer.Options[option.Name] = ChannelOption{
+						Value: interactionOption.ChannelValue(session),
+						Name:  option.Name,
+					}
+				case discordgo.ApplicationCommandOptionRole:
+					returnContainer.Options[option.Name] = RoleOption{
+						Value: interactionOption.RoleValue(session, i.GuildID),
+						Name:  option.Name,
+					}
+				case discordgo.ApplicationCommandOptionMentionable:
+					returnContainer.Options[option.Name] = UserOption{
+						Value: interactionOption.UserValue(session),
+						Name:  option.Name,
+					}
+				default:
+					return returnContainer, ErrInvalidOptionType
+				}
+			} else {
+				returnContainer.Options[option.Name] = option.Default
+			}
 		}
 	}
 	return returnContainer, nil
@@ -101,6 +141,7 @@ type OptionRequirement struct {
 	Name        string
 	Description string
 	Type        discordgo.ApplicationCommandOptionType
+	Default     CommandOption
 }
 
 type OptionContainer struct {
