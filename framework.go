@@ -1,6 +1,7 @@
 package mtn_go_discord_framework
 
 import (
+	"fmt"
 	"log"
 	"strings"
 	"sync"
@@ -154,7 +155,7 @@ func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			validatedOptions, err := command.validateOptions(s, i)
 			if err != nil {
 				log.Printf("MTN Discord Framework - handleCommand: Invalid options for command '%s'", command.Name)
-				SendEphemeralResponse(s, i, "An Error occured: Invalid options")
+				SendEphemeralResponse(s, i, fmt.Sprintf("Invalid option '%s'", err.Error()))
 				return
 			}
 			command.Handler(s, i, &validatedOptions)
