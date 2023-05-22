@@ -40,7 +40,7 @@ const (
 	ephemeralFlag = 64
 )
 
-func InitFramework(debugMode bool, testingGuildId string, botToken string) {
+func InitFramework(debugMode bool, testingGuildId string, botToken string) *discordgo.Session {
 	debug = debugMode
 	testingGuildID = testingGuildId
 	token = botToken
@@ -53,6 +53,7 @@ func InitFramework(debugMode bool, testingGuildId string, botToken string) {
 	discordSession.AddHandler(handleCommand)
 
 	ready = true
+	return discordSession
 }
 
 func RegisterSlashCommandWithFramework(command Command) {
