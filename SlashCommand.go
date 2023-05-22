@@ -59,6 +59,11 @@ func (s SlashCommand) validateOptions(session *discordgo.Session, i *discordgo.I
 						Value: interactionOption.IntValue(),
 						Name:  option.Name,
 					}
+				case discordgo.ApplicationCommandOptionNumber:
+					returnContainer.Options[option.Name] = FloatOption{
+						Value: interactionOption.FloatValue(),
+						Name:  option.Name,
+					}
 				case discordgo.ApplicationCommandOptionBoolean:
 					returnContainer.Options[option.Name] = BooleanOption{
 						Value: interactionOption.BoolValue(),
@@ -97,6 +102,11 @@ func (s SlashCommand) validateOptions(session *discordgo.Session, i *discordgo.I
 				case discordgo.ApplicationCommandOptionInteger:
 					returnContainer.Options[option.Name] = IntegerOption{
 						Value: interactionOption.IntValue(),
+						Name:  option.Name,
+					}
+				case discordgo.ApplicationCommandOptionNumber:
+					returnContainer.Options[option.Name] = FloatOption{
+						Value: interactionOption.FloatValue(),
 						Name:  option.Name,
 					}
 				case discordgo.ApplicationCommandOptionBoolean:
