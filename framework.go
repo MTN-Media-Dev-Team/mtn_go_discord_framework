@@ -98,6 +98,10 @@ func StartFramework() {
 		}
 		log.Println("Initialized commands")
 	})
+	err := discordSession.Open()
+	if err != nil {
+		log.Fatal(err)
+	}
 	registerCommands(discordSession)
 }
 
