@@ -60,11 +60,11 @@ func InitFramework(debugMode bool, testingGuildId string, botToken string) *disc
 // Registers a slash command with the framework
 func RegisterSlashCommandWithFramework(command SlashCommand) {
 	if !ready {
-		log.Println("Framework not ready yet, cannot register command")
+		log.Println("MTN Discord Framework - RegisterSlashCommandWithFramework: Framework not ready yet, cannot register command")
 		return
 	}
 	if initDone {
-		log.Println("Framework already initialized, cannot register command")
+		log.Println("MTN Discord Framework - RegisterSlashCommandWithFramework: Framework already initialized, cannot register command")
 		return
 	}
 	commandsToRegister = append(commandsToRegister, command)
@@ -73,11 +73,11 @@ func RegisterSlashCommandWithFramework(command SlashCommand) {
 // Registers multiple slash commands with the framework
 func RegisterSlashCommandsWithFramework(commands []SlashCommand) {
 	if !ready {
-		log.Println("Framework not ready yet, cannot register commands")
+		log.Println("MTN Discord Framework - RegisterSlashCommandsWithFramework: Framework not ready yet, cannot register commands")
 		return
 	}
 	if initDone {
-		log.Println("Framework already initialized, cannot register commands")
+		log.Println("MTN Discord Framework - RegisterSlashCommandsWithFramework: Framework already initialized, cannot register commands")
 		return
 	}
 	commandsToRegister = append(commandsToRegister, commands...)
@@ -86,11 +86,11 @@ func RegisterSlashCommandsWithFramework(commands []SlashCommand) {
 // Registers a button handler with the framework
 func RegisterButtonHandlerWithFramework(handler ButtonHandler) {
 	if !ready {
-		log.Println("Framework not ready yet, cannot register command")
+		log.Println("MTN Discord Framework - RegisterButtonHandlerWithFramework: Framework not ready yet, cannot register command")
 		return
 	}
 	if initDone {
-		log.Println("Framework already initialized, cannot register command")
+		log.Println("MTN Discord Framework - RegisterButtonHandlerWithFramework: Framework already initialized, cannot register command")
 		return
 	}
 	handlerMap[handler.CustomID] = handler
@@ -99,11 +99,11 @@ func RegisterButtonHandlerWithFramework(handler ButtonHandler) {
 // Registers multiple button handlers with the framework
 func RegisterButtonHandlersWithFramework(handlers []ButtonHandler) {
 	if !ready {
-		log.Println("Framework not ready yet, cannot register commands")
+		log.Println("MTN Discord Framework - RegisterButtonHandlersWithFramework: Framework not ready yet, cannot register commands")
 		return
 	}
 	if initDone {
-		log.Println("Framework already initialized, cannot register commands")
+		log.Println("MTN Discord Framework - RegisterButtonHandlersWithFramework: Framework already initialized, cannot register commands")
 		return
 	}
 	for _, handler := range handlers {
@@ -114,12 +114,12 @@ func RegisterButtonHandlersWithFramework(handlers []ButtonHandler) {
 // Launches the framework and registers all commands and handlers
 func StartFramework() {
 	if !ready {
-		log.Println("Framework not ready yet, cannot start it. Call InitFramework first")
+		log.Println("MTN Discord Framework - StartFramework: Framework not ready yet, cannot start it. Call InitFramework first")
 		return
 	}
 	// check if discord session is initialized if not initialize it
 	if discordSession == nil {
-		log.Println("Discord session not initialized, initializing it now")
+		log.Println("MTN Discord Framework - StartFramework: Discord session not initialized, initializing it now")
 		InitFramework(debug, testingGuildID, token)
 	}
 
@@ -128,7 +128,7 @@ func StartFramework() {
 		for _, command := range commandsToRegister {
 			commandsMap[command.Name] = command
 		}
-		log.Println("Initialized commands")
+		log.Println("MTN Discord Framework - StartFramework: Initialized commands")
 	})
 	err := discordSession.Open()
 	if err != nil {
@@ -140,7 +140,7 @@ func StartFramework() {
 // Shuts down the framework and closes the discord session
 func ShutdownFramework() {
 	if !ready || !initDone {
-		log.Println("Framework not started, cannot shut it down")
+		log.Println("MTN Discord Framework - ShutdownFramework: Framework not started, cannot shut it down")
 		return
 	}
 	deleteCommands(discordSession)
@@ -159,7 +159,7 @@ func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			command.Handler(s, i)
 			return
 		}
-		log.Printf("Unknown command '%s'", i.ApplicationCommandData().Name)
+		log.Printf("MTN Discord Framework - handleCommand: Unknown command '%s'", i.ApplicationCommandData().Name)
 
 	// check if i type is MessageComponent
 	case discordgo.InteractionMessageComponent:
@@ -178,44 +178,44 @@ func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 					return
 				}
 			}
-			log.Printf("Unknown button '%s'", i.MessageComponentData().CustomID)
+			log.Printf("MTN Discord Framework - handleCommand: Unknown button '%s'", i.MessageComponentData().CustomID)
 		}
-		log.Printf("Unknown message component type '%v'", i.MessageComponentData().ComponentType)
+		log.Printf("MTN Discord Framework - handleCommand: Unknown message component type '%v'", i.MessageComponentData().ComponentType)
 	default:
-		log.Printf("Unknown interaction type '%s'", i.Type)
+		log.Printf("MTN Discord Framework - handleCommand: Unknown interaction type '%s'", i.Type)
 	}
 }
 
 func registerCommands(s *discordgo.Session) {
 	guildid := ""
 	if debug {
-		log.Println("Registering commands in DEBUG mode")
+		log.Println("MTN Discord Framework - registerCommands: Registering commands in DEBUG mode")
 		guildid = testingGuildID
 	}
 	for name, command := range commandsMap {
 		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildid, &command.ApplicationCommand)
 		if err != nil {
-			log.Printf("Cannot create '%s' command: %v", command.Name, err)
+			log.Printf("MTN Discord Framework - registerCommands: Cannot create '%s' command: %v", command.Name, err)
 			continue
 		}
 		// Update the command in the global commands map
 		command.ApplicationCommand = *cmd
 		commandsMap[name] = command
 	}
-	log.Println("Registered commands")
+	log.Println("MTN Discord Framework - registerCommands: Registered commands")
 }
 
 func deleteCommands(s *discordgo.Session) {
 	guildid := ""
 	if debug {
-		log.Println("Deleting commands in DEBUG mode")
+		log.Println("MTN Discord Framework - deleteCommands: Deleting commands in DEBUG mode")
 		guildid = testingGuildID
 	}
 	for _, command := range commandsMap {
 		err := s.ApplicationCommandDelete(s.State.User.ID, guildid, command.ApplicationCommand.ID)
 		if err != nil {
-			log.Printf("Cannot delete '%s' command: %v", command.Name, err)
+			log.Printf("MTN Discord Framework - deleteCommands: Cannot delete '%s' command: %v", command.Name, err)
 		}
 	}
-	log.Println("Deleted commands")
+	log.Println("MTN Discord Framework - deleteCommands: Deleted commands")
 }
