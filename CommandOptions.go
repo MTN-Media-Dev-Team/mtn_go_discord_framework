@@ -3,7 +3,7 @@ package mtn_go_discord_framework
 import "github.com/bwmarrin/discordgo"
 
 type CommandOption interface {
-	GetValue() interface{}
+	GetValue() any
 	GetName() string
 }
 
@@ -12,7 +12,7 @@ type StringOption struct {
 	Name  string
 }
 
-func (s StringOption) GetValue() interface{} {
+func (s StringOption) GetValue() any {
 	return s.Value
 }
 func (s StringOption) GetName() string {
@@ -24,7 +24,7 @@ type IntegerOption struct {
 	Name  string
 }
 
-func (s IntegerOption) GetValue() interface{} {
+func (s IntegerOption) GetValue() any {
 	return s.Value
 }
 
@@ -37,7 +37,7 @@ type UnsignedIntergerOption struct {
 	Name  string
 }
 
-func (s UnsignedIntergerOption) GetValue() interface{} {
+func (s UnsignedIntergerOption) GetValue() any {
 	return s.Value
 }
 
@@ -50,7 +50,7 @@ type BooleanOption struct {
 	Name  string
 }
 
-func (s BooleanOption) GetValue() interface{} {
+func (s BooleanOption) GetValue() any {
 	return s.Value
 }
 
@@ -63,7 +63,7 @@ type FloatOption struct {
 	Name  string
 }
 
-func (s FloatOption) GetValue() interface{} {
+func (s FloatOption) GetValue() any {
 	return s.Value
 }
 
@@ -76,7 +76,7 @@ type UserOption struct {
 	Name  string
 }
 
-func (s UserOption) GetValue() interface{} {
+func (s UserOption) GetValue() any {
 	return s.Value
 }
 
@@ -89,7 +89,7 @@ type ChannelOption struct {
 	Name  string
 }
 
-func (s ChannelOption) GetValue() interface{} {
+func (s ChannelOption) GetValue() any {
 	return s.Value
 }
 
@@ -102,7 +102,7 @@ type RoleOption struct {
 	Name  string
 }
 
-func (s RoleOption) GetValue() interface{} {
+func (s RoleOption) GetValue() any {
 	return s.Value
 }
 
