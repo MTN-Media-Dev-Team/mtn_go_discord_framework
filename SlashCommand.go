@@ -82,6 +82,11 @@ func assignOptionValue(interactionOption *discordgo.ApplicationCommandInteractio
 			Value: interactionOption.BoolValue(),
 			Name:  option.Name,
 		}, nil
+	case discordgo.ApplicationCommandOptionUser:
+		return UserOption{
+			Value: interactionOption.UserValue(session),
+			Name:  option.Name,
+		}, nil
 	case discordgo.ApplicationCommandOptionChannel:
 		return ChannelOption{
 			Value: interactionOption.ChannelValue(session),

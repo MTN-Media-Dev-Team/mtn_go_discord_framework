@@ -181,6 +181,7 @@ func handleCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
 				}
 			}
 			log.Printf("MTN Discord Framework - handleCommand: Unknown button '%s'", i.MessageComponentData().CustomID)
+			return
 		}
 		log.Printf("MTN Discord Framework - handleCommand: Unknown message component type '%v'", i.MessageComponentData().ComponentType)
 	default:
