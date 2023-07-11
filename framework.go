@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -30,6 +31,8 @@ var (
 
 	systemBusy = false
 	mutex      = &sync.Mutex{}
+
+	rateLimitTimeout time.Duration = 10 * time.Millisecond
 )
 
 const (
@@ -206,6 +209,9 @@ func registerCommands(s *discordgo.Session) {
 		// Update the command in the global commands map
 		command.applicationCommand = *cmd
 		commandsMap[name] = command
+
+		// sleep for rateLimitTimeout ms
+		time.Sleep(rateLimitTimeout)
 	}
 	log.Println("MTN Discord Framework - registerCommands: Registered commands")
 }
@@ -221,6 +227,9 @@ func deleteCommands(s *discordgo.Session) {
 		if err != nil {
 			log.Printf("MTN Discord Framework - deleteCommands: Cannot delete '%s' command: %v", command.Name, err)
 		}
+
+		// sleep for rateLimitTimeout ms
+		time.Sleep(rateLimitTimeout)
 	}
 	log.Println("MTN Discord Framework - deleteCommands: Deleted commands")
 }
