@@ -102,6 +102,11 @@ func assignOptionValue(interactionOption *discordgo.ApplicationCommandInteractio
 			Value: interactionOption.UserValue(session),
 			Name:  option.Name,
 		}, nil
+	// case discordgo.ApplicationCommandOptionSubCommand:
+	// 	return SubCommandOption{
+	// 		Value: interactionOption,
+	// 		Name:  option.Name,
+	// 	}, nil
 	default:
 		return nil, ErrInvalidOptionType
 	}

@@ -92,3 +92,23 @@ func CheckForRoles(s *discordgo.Session, i *discordgo.InteractionCreate, roles .
 
 	return false
 }
+
+func CheckForRolesOrAdmin(s *discordgo.Session, i *discordgo.InteractionCreate, roles ...string) bool {
+	if CheckForAdmin(s, i) {
+		return true
+	}
+	return CheckForRoles(s, i, roles...)
+}
+
+func CheckForAdmin(s *discordgo.Session, i *discordgo.InteractionCreate) bool {
+	member, err := s.GuildMember(i.GuildID, i.Member.User.ID)
+	if err != nil {
+		log.Printf("MTN Discord Framework - CheckForRoles: Error getting guild member: %v", err)
+		return false
+	}
+	// check if user has administator on the guild
+	if member.Permissions&discordgo.PermissionAdministrator == discordgo.PermissionAdministrator {
+		return true
+	}
+	return false
+}

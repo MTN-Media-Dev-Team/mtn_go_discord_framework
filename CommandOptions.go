@@ -109,3 +109,21 @@ func (s RoleOption) GetValue() any {
 func (s RoleOption) GetName() string {
 	return s.Name
 }
+
+// type SubCommandOption struct {
+// 	Value *discordgo.ApplicationCommandInteractionDataOption
+// 	Name  string
+// 	Type  discordgo.ApplicationCommandOptionType
+// }
+
+// func (s SubCommandOption) GetValue() any {
+// 	return s.Value
+// }
+
+// func (s SubCommandOption) GetName() string {
+// 	return s.Name
+// }
+
+// func (s SubCommandOption) GetType() discordgo.ApplicationCommandOptionType {
+// 	return s.Type
+// }
