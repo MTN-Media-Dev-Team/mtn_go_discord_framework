@@ -79,9 +79,10 @@ func exampleOptionsCommand() mtn_go_discord_framework.SlashCommand {
 		boolvalue := options.Options["boolvalue"].GetValue().(bool)
 
         // check if user had roles or admin if needed
-        authenticated := mtn_go_discord_framework.CheckForRoles(s, i, GROUP_ID1, GROUP_ID2) // unlimited roles can be provided
-        authenticated := mtn_go_discord_framework.CheckForAdmin(s, i)
-        authenticated := mtn_go_discord_framework.CheckForRolesOrAdmin(s, i, GROUP_ID1, GROUP_ID2) // unlimited roles can be provided
+		var authenticated bool
+        authenticated = mtn_go_discord_framework.CheckForRoles(s, i, GROUP_ID1, GROUP_ID2) // unlimited roles can be provided
+        authenticated = mtn_go_discord_framework.CheckForAdmin(s, i)
+        authenticated = mtn_go_discord_framework.CheckForRolesOrAdmin(s, i, GROUP_ID1, GROUP_ID2) // unlimited roles can be provided
 
         // do something
 
