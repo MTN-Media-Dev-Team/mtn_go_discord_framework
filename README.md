@@ -71,7 +71,7 @@ func testCommand() mtn_go_discord_framework.SlashCommand {
 
 ```go
 
-func openTableCommand() mtn_go_discord_framework.SlashCommand {
+func exampleOptionsCommand() mtn_go_discord_framework.SlashCommand {
 	handler := func(s *discordgo.Session, i *discordgo.InteractionCreate, options *mtn_go_discord_framework.OptionContainer) {
 		// get options from container. If required options are not provided, the handler will not be called, so no need to check for nil. If required is false default values will be used if not provided by user
 		stringvalue := options.Options["stringvalue"].GetValue().(string)
@@ -87,8 +87,8 @@ func openTableCommand() mtn_go_discord_framework.SlashCommand {
 
 	}
 	command := mtn_go_discord_framework.SlashCommand{
-		Name:        "opentable",
-		Description: "Open a blackjack table",
+		Name:        "exampleoptions",
+		Description: "Example command with options",
 		RequiredOptions: []mtn_go_discord_framework.OptionRequirement{
 			{
 				Name:        "stringvalue",
