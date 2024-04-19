@@ -32,7 +32,7 @@ var (
 	systemBusy = false
 	mutex      = &sync.Mutex{}
 
-	rateLimitTimeout time.Duration = 10 * time.Millisecond
+	rateLimitTimeout time.Duration = 500 * time.Millisecond
 )
 
 const (
@@ -51,6 +51,7 @@ func InitFramework(debugMode bool, testingGuildId string, botToken string) *disc
 	}
 	discordSession = discord
 	discordSession.AddHandler(handleCommand)
+	discord.ShouldRetryOnRateLimit = true
 
 	ready = true
 	return discordSession
@@ -198,22 +199,28 @@ func registerCommands(s *discordgo.Session) {
 		log.Println("MTN Discord Framework - registerCommands: Registering commands in DEBUG mode")
 		guildid = testingGuildID
 	}
-	for name, command := range commandsMap {
-		command.applicationCommand = command.generateApplicationCommand()
-
-		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildid, &command.applicationCommand)
-		if err != nil {
-			log.Printf("MTN Discord Framework - registerCommands: Cannot create '%s' command: %v", command.Name, err)
-			continue
-		}
-		// Update the command in the global commands map
-		command.applicationCommand = *cmd
-		commandsMap[name] = command
-
-		// sleep for rateLimitTimeout ms
-		time.Sleep(rateLimitTimeout)
+	wg := &sync.WaitGroup{}
+	for _, command := range commandsMap {
+		wg.Add(1)
+		go registerCommand(s, command, guildid, wg)
 	}
+	wg.Wait()
 	log.Println("MTN Discord Framework - registerCommands: Registered commands")
+}
+
+func registerCommand(s *discordgo.Session, command SlashCommand, guildid string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	command.applicationCommand = command.generateApplicationCommand()
+
+	cmd, err := s.ApplicationCommandCreate(s.State.User.ID, guildid, &command.applicationCommand)
+	if err != nil {
+		log.Printf("MTN Discord Framework - registerCommand: Cannot create '%s' command: %v", command.Name, err)
+		return
+	}
+	// Update the command in the global commands map
+	command.applicationCommand = *cmd
+	commandsMap[command.Name] = command
+	log.Printf("MTN Discord Framework - registerCommand: Registered '%s' command", command.Name)
 }
 
 func deleteCommands(s *discordgo.Session) {
